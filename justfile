@@ -23,7 +23,7 @@ run:
     qemu-system-{{ARCH}} -enable-kvm -m {{SYSTEM_RAM}} \
         -drive if=pflash,format=raw,readonly=on,file=./temp/OVMF.4m.fd \
         -drive format=raw,file=fat:rw:{{IMG_PATH}} \
-        -serial stdio -display sdl,full-screen=on
+        -serial stdio -display sdl,full-screen=on 
 
 clean:
     cargo clean
