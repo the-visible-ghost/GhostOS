@@ -53,9 +53,8 @@ fn boot_ghostos(g_host: &mut ghost::Ghost) {
         };
         info!("{:?}", bi);
         boot::exit_boot_services(None);
-        let kernel: extern "sysv64" fn(boot_info: &BootInfo, width: u64) -> ! =
-            core::mem::transmute(entry);
-        kernel(&bi, 800);
+        let kernel: extern "sysv64" fn(&BootInfo) -> ! = core::mem::transmute(entry);
+        kernel(&bi);
     }
 }
 

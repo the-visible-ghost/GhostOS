@@ -1,2 +1,9 @@
 [workspace]
-members = ["bootloader","kernel"]
+members = ["bootloader", "common","kernel"]
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
