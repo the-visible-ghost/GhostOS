@@ -23,9 +23,7 @@ impl Resolution {
 }
 
 impl<'a> Buffer<'a> {
-    #[inline]
     pub fn new(res: Resolution, pitch: usize, frame: &'a mut [u32]) -> Self {
-        frame[0] = 0xFF0000FF;
         Self {
             width: res.width,
             height: res.height,
@@ -34,14 +32,12 @@ impl<'a> Buffer<'a> {
         }
     }
 
-    #[inline]
     pub fn set_pixel(&mut self, pos: Position, color: Color) {
         if self.check_position(pos.x, pos.y) {
             self.set_pixel_unchecked(pos, color);
         }
     }
 
-    #[inline]
     pub fn get_pixel(&self, x: usize, y: usize) -> Option<Color> {
         if !self.check_position(x, y) {
             return None;
@@ -49,28 +45,17 @@ impl<'a> Buffer<'a> {
         Some(self.get_pixel_unchecked(x, y))
     }
 
-    #[inline]
-    fn check_position(&self, x: usize, y: usize) -> bool {
-        if x < self.width && y < self.height {
-            return true;
-        }
-        false
-    }
-
-    #[inline]
     pub fn blend_pixel(&mut self, pos: Position, color: Color) {
         if self.check_position(pos.x, pos.y) {
             self.blend_pixel_unchecked(pos, color);
         }
     }
 
-    #[inline]
     pub fn resize(&mut self, x: usize, y: usize) {
         self.width = x;
         self.height = y;
     }
 
-    #[inline]
     pub fn blackout(&mut self) {
         for x in 0..self.width {
             for y in 0..self.height {
@@ -79,7 +64,6 @@ impl<'a> Buffer<'a> {
         }
     }
 
-    #[inline]
     pub fn test(&mut self) {
         for x in 0..self.width {
             for y in 0..self.height {
@@ -89,6 +73,14 @@ impl<'a> Buffer<'a> {
                 );
             }
         }
+    }
+
+    #[inline]
+    fn check_position(&self, x: usize, y: usize) -> bool {
+        if x < self.width && y < self.height {
+            return true;
+        }
+        false
     }
 
     #[inline]

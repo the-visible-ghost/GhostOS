@@ -26,16 +26,10 @@ pub fn boot(g_host: &mut ghost::Ghost) {
         }
     }
 
+    info!("Calling kernel ...");
+    let gfx = g_host.gfx.as_mut().unwrap();
+    let pitch = gfx.graphics_proto.current_mode_info().stride();
     unsafe {
-        info!("Calling kernel ...");
-        let gfx = g_host.gfx.as_mut().unwrap();
-        // let bi = BootInfo {
-        //     framebuffer_ptr: gfx.graphics_proto.frame_buffer().as_mut_ptr() as u64,
-        //     framebuffer_width: gfx.resolution.0 as u64,
-        //     framebuffer_height: gfx.resolution.1 as u64,
-        //     framebuffer_pitch: gfx.graphics_proto.current_mode_info().stride() as u64,
-        // };
-        let pitch = gfx.graphics_proto.current_mode_info().stride();
         let boot_info = common::BootInfo {
             framebuffer: common::gfx::buffer::Buffer::new(
                 common::gfx::buffer::Resolution::new(gfx.resolution.0, gfx.resolution.1),
