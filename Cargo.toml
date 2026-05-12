@@ -1,2 +1,3 @@
 [workspace]
 members = ["bootloader","kernel"]
+spin = "0.9"

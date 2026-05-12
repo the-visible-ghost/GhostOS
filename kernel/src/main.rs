@@ -1,6 +1,11 @@
 #![no_main]
 #![no_std]
 
+mod allocator;
+
+extern crate alloc; //created support but cannot use until allocator and its' error handler exists
+
+use crate::allocator::bump::{ALLOCATOR, HEAP_SIZE, HEAP_START};
 use core::panic::PanicInfo;
 
 #[repr(C)]
@@ -21,6 +26,11 @@ pub extern "C" fn kernel_main(_bi: &'static BootInfo, width: u64) -> ! {
             framebuffer_pitch: 1920,
         };
 
+        ALLOCATOR.lock().init(HEAP_START, HEAP_SIZE);
+
+        use alloc::vec::Vec;
+        let mut v = Vec::new();
+        v.push(11);
         // bi;
         for x in 0..bi.framebuffer_width {
             for y in 0..bi.framebuffer_height {
