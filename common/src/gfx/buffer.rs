@@ -70,6 +70,7 @@ impl<'a> Buffer<'a> {
         self.height = y;
     }
 
+    #[inline]
     pub fn blackout(&mut self) {
         for x in 0..self.width {
             for y in 0..self.height {

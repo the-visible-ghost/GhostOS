@@ -2,8 +2,7 @@
 #![no_std]
 
 mod allocator;
-extern crate alloc;
-use crate::allocator::bump::{ALLOCATOR, HEAP_SIZE, HEAP_START};
+use allocator::bump::{ALLOCATOR, HEAP_SIZE, HEAP_START};
 
 extern crate common;
 
