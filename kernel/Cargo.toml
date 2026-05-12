@@ -7,17 +7,3 @@ edition = "2024"
 spin = "0.10.0"
 
 common = { path = "../common" }
-
-[profile.dev]
-panic = "abort"
-
-[profile.release]
-panic = "abort"
-
-[build]
-target = "x86_64-unknown-none"
-
-[target.x86_64-unknown-none]
-rustflags = [
-    "-C", "link-arg=-Tlinker.ld",
-]

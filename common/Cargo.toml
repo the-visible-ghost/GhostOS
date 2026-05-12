@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-ab_glyph = "0.2.32"
+ab_glyph = { version = "0.2.32", default-features = false, features = ["libm"] }
 hashbrown = "0.17.1"

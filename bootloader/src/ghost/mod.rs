@@ -1,11 +1,8 @@
-use uefi::{
-    boot::{self, ScopedProtocol},
-    fs::FileSystem,
-    proto::console::text,
-};
+use uefi::{boot::ScopedProtocol, fs::FileSystem, proto::console::text};
 
 use self::common::fs;
 
+pub mod boot;
 pub mod common;
 pub mod config;
 pub mod gfx;
@@ -20,9 +17,9 @@ pub struct Ghost<'a> {
 
 impl<'a> Ghost<'a> {
     pub fn init() -> Self {
-        let image_handle = boot::image_handle();
-        let stdin_handle = boot::get_handle_for_protocol::<text::Input>().unwrap();
-        let stdin = boot::open_protocol_exclusive::<text::Input>(stdin_handle).unwrap();
+        let image_handle = uefi::boot::image_handle();
+        let stdin_handle = uefi::boot::get_handle_for_protocol::<text::Input>().unwrap();
+        let stdin = uefi::boot::open_protocol_exclusive::<text::Input>(stdin_handle).unwrap();
         let mut ghost = Self {
             ih: image_handle,
             gfx: gfx::init(),

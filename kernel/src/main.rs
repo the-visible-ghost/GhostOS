@@ -8,16 +8,7 @@ extern crate alloc; //created support but cannot use until allocator and its' er
 use crate::allocator::bump::{ALLOCATOR, HEAP_SIZE, HEAP_START};
 extern crate common;
 
-use common::gfx;
 use core::panic::PanicInfo;
-
-#[repr(C)]
-pub struct BootInfo {
-    pub framebuffer_ptr: *mut [u32],
-    pub framebuffer_width: u64,
-    pub framebuffer_height: u64,
-    pub framebuffer_pitch: u64, // pixels per row
-}
 
 #[unsafe(no_mangle)]
 pub extern "C" fn kernel_main(_bi: &'static BootInfo, width: u64) -> ! {

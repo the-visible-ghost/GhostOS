@@ -1,62 +1,15 @@
-#![no_main]
 #![no_std]
+#![no_main]
 
 mod ghost;
 
 use core::time::Duration;
 
-use elf::ElfBytes;
-use elf::endian::AnyEndian;
 use log::info;
 use uefi::proto::console::text::{Key, ScanCode};
 use uefi::{Char16, prelude::*};
 
 use crate::ghost::gfx;
-
-#[derive(Debug)]
-#[repr(C)]
-struct BootInfo {
-    pub framebuffer_ptr: u64,
-    pub framebuffer_width: u64,
-    pub framebuffer_height: u64,
-    pub framebuffer_pitch: u64, // pixels per row
-}
-
-fn boot_ghostos(g_host: &mut ghost::Ghost) {
-    let fs = g_host.fs.as_mut().unwrap();
-    let buffer = fs
-        .read(cstr16!("\\ghost-krnl"))
-        .expect("Cant open \\ghost-krnl");
-    let elf = ElfBytes::<AnyEndian>::minimal_parse(&buffer).expect("Invalid ELF");
-    let base: u64 = 0x100000;
-    let entry = (base + elf.ehdr.e_entry) as usize;
-    let phdrs = elf.segments().expect("no segments");
-    for ph in phdrs {
-        let seg_start = ph.p_offset as usize;
-        let seg_end = seg_start + ph.p_filesz as usize;
-        let segment = &buffer[seg_start..seg_end];
-        let dest = (base + ph.p_vaddr) as *mut u8;
-
-        unsafe {
-            core::ptr::copy_nonoverlapping(segment.as_ptr(), dest, segment.len());
-        }
-    }
-
-    unsafe {
-        info!("Calling kernel ...");
-        let gfx = g_host.gfx.as_mut().unwrap();
-        let bi = BootInfo {
-            framebuffer_ptr: gfx.graphics_proto.frame_buffer().as_mut_ptr() as u64,
-            framebuffer_width: gfx.resolution.0 as u64,
-            framebuffer_height: gfx.resolution.1 as u64,
-            framebuffer_pitch: gfx.graphics_proto.current_mode_info().stride() as u64,
-        };
-        info!("{:?}", bi);
-        boot::exit_boot_services(None);
-        let kernel: extern "sysv64" fn(&BootInfo) -> ! = core::mem::transmute(entry);
-        kernel(&bi);
-    }
-}
 
 #[entry]
 fn main() -> Status {
@@ -80,7 +33,7 @@ fn main() -> Status {
                 Key::Printable(key) => {
                     if key == enter_key {
                         info!("Boot key pressed");
-                        boot_ghostos(&mut g_host);
+                        ghost::boot::ghostos::boot(&mut g_host);
                         break;
                     } else if key == t_key {
                         info!("Terminal Key pressed");

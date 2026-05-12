@@ -10,16 +10,19 @@ SYSROOT := "./sysroot"
 
 BUILD_FLAGS := ""
 
-build crate target:
-    cargo build -p {{crate}} --target {{ARCH}}-{{target}} {{BUILD_FLAGS}} 
-
-install:
-    cp ./target/{{ARCH}}-unknown-uefi/{{MODE}}/bootloader.efi \
+bootloader:
+    cargo build -p bootloader --target {{ARCH}}-unknown-uefi
+    @cp ./target/{{ARCH}}-unknown-uefi/{{MODE}}/bootloader.efi \
         {{SYSROOT}}/boot/efi/boot/bootx64.efi
-    # cp ./target/{{ARCH}}-unknown-none/{{MODE}}/kernel \
-    #     {{SYSROOT}}/boot/ghost-krnl
 
-run: 
+kernel:
+    cargo build -p kernel --target {{ARCH}}-unknown-none
+    @cp ./target/{{ARCH}}-unknown-none/{{MODE}}/kernel \
+        {{SYSROOT}}/boot/ghost-krnl
+
+build: bootloader kernel
+
+run:
     qemu-system-{{ARCH}} -enable-kvm -m {{SYSTEM_RAM}} \
         -drive if=pflash,format=raw,readonly=on,file=./temp/OVMF.4m.fd \
         -drive format=raw,file=fat:rw:{{IMG_PATH}} \
