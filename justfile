@@ -3,23 +3,25 @@ ARCH := "x86_64"
 
 SYSTEM_RAM := "1G"
 
+MODE := "debug"
+
 IMG_PATH := "./sysroot/boot"
 SYSROOT := "./sysroot"
 
 BUILD_FLAGS := ""
 
 bootloader:
-    cargo build -r -p bootloader \
+    cargo build -p bootloader \
         --target {{ARCH}}-unknown-uefi \
         --config ./bootloader/.cargo/config.toml
-    @cp ./target/{{ARCH}}-unknown-uefi/release/bootloader.efi \
+    @cp ./target/{{ARCH}}-unknown-uefi/{{MODE}}/bootloader.efi \
         {{SYSROOT}}/boot/efi/boot/bootx64.efi
 
 kernel:
-    cargo build -r -p kernel \
+    cargo build -p kernel \
         --target {{ARCH}}-unknown-none \
         --config ./kernel/.cargo/config.toml
-    @cp ./target/{{ARCH}}-unknown-none/release/kernel \
+    @cp ./target/{{ARCH}}-unknown-none/{{MODE}}/kernel \
         {{SYSROOT}}/boot/ghost-krnl
 
 build: bootloader kernel

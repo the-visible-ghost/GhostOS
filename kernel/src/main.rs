@@ -14,9 +14,9 @@ pub extern "sysv64" fn kernel_main(boot_info: &'static mut common::BootInfo) -> 
     let fb = &mut boot_info.framebuffer;
     fb.test();
 
-    use alloc::vec::Vec;
-    let mut v = Vec::new();
-    v.push(11);
+    // use alloc::vec::Vec;
+    // let mut v = Vec::new();
+    // v.push(11);
 
     loop {}
 }
