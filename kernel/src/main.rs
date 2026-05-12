@@ -2,7 +2,8 @@
 #![no_std]
 
 mod allocator;
-use allocator::bump::{ALLOCATOR, HEAP_SIZE, HEAP_START};
+extern crate alloc;
+use crate::allocator::bump::{ALLOCATOR, HEAP_SIZE, HEAP_START};
 
 extern crate common;
 
@@ -12,6 +13,10 @@ use core::panic::PanicInfo;
 pub extern "sysv64" fn kernel_main(boot_info: &'static mut common::BootInfo) -> ! {
     let fb = &mut boot_info.framebuffer;
     fb.test();
+
+    use alloc::vec::Vec;
+    let mut v = Vec::new();
+    v.push(11);
 
     loop {}
 }
