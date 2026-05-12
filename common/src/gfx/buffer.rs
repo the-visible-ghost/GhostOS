@@ -1,18 +1,34 @@
 use super::Position;
 use super::color::Color;
 
+use core::fmt;
+
+pub struct Resolution {
+    pub width: usize,
+    pub height: usize,
+}
+
 pub struct Buffer<'a> {
     pub width: usize,
     pub height: usize,
     pitch: usize,
-    frame: &'a mut [u32],
+    pub frame: &'a mut [u32],
+}
+
+impl Resolution {
+    #[inline]
+    pub fn new(width: usize, height: usize) -> Self {
+        Self { width, height }
+    }
 }
 
 impl<'a> Buffer<'a> {
-    pub fn new(res: (usize, usize), pitch: usize, frame: &'a mut [u32]) -> Self {
+    #[inline]
+    pub fn new(res: Resolution, pitch: usize, frame: &'a mut [u32]) -> Self {
+        frame[0] = 0xFF0000FF;
         Self {
-            width: res.0,
-            height: res.1,
+            width: res.width,
+            height: res.height,
             pitch,
             frame,
         }
@@ -62,12 +78,13 @@ impl<'a> Buffer<'a> {
         }
     }
 
+    #[inline]
     pub fn test(&mut self) {
         for x in 0..self.width {
             for y in 0..self.height {
                 self.set_pixel(
                     Position::new(x, y),
-                    Color::new(255, (x % 255) as u8, (y % 255) as u8, 255),
+                    Color::new((x % 255) as u8, (y % 255) as u8, 255, 255),
                 );
             }
         }
@@ -87,5 +104,16 @@ impl<'a> Buffer<'a> {
     fn blend_pixel_unchecked(&mut self, pos: Position, color: Color) {
         let resultant = color.blend(self.get_pixel_unchecked(pos.x, pos.y));
         self.set_pixel_unchecked(pos, resultant);
+    }
+}
+
+impl fmt::Debug for Buffer<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Buffer")
+            .field("width", &self.width)
+            .field("height", &self.height)
+            .field("pitch", &self.pitch)
+            .field("frame", &self.frame.as_ptr())
+            .finish()
     }
 }

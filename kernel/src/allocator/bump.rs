@@ -51,8 +51,3 @@ unsafe impl GlobalAlloc for Locked<BumpAllocator> {
 
 #[global_allocator]
 pub static ALLOCATOR: Locked<BumpAllocator> = Locked::new(BumpAllocator::new());
-
-#[alloc_error_handler]
-fn alloc_error(layout: Layout) -> ! {
-    panic!("allocation error: {:?}", layout);
-}

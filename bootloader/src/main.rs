@@ -6,6 +6,7 @@ mod ghost;
 use core::time::Duration;
 
 use log::info;
+use uefi::proto::console::gop::BltPixel;
 use uefi::proto::console::text::{Key, ScanCode};
 use uefi::{Char16, prelude::*};
 
@@ -18,6 +19,8 @@ fn main() -> Status {
     let mut g_host = ghost::Ghost::init();
     if let Some(gfx) = &mut g_host.gfx {
         gfx::set_res(gfx, (1920, 1080));
+        gfx.frame_buffer.pixels[0] = BltPixel::new(255, 0, 0);
+        gfx.frame_buffer.blit(&mut gfx.graphics_proto);
     }
 
     let enter_key = Char16::try_from('\r').unwrap();

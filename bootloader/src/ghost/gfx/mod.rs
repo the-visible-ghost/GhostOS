@@ -10,15 +10,15 @@ use super::Ghost;
 mod common;
 mod html;
 
-pub struct GhostGFX<'a> {
+pub struct GhostGFX {
     pub frame_count: u64,
     pub frame_buffer: Buffer,
     pub resolution: (usize, usize),
     pub graphics_proto: ScopedProtocol<GraphicsOutput>,
-    pub theme: common::theme::Theme<'a>,
+    // pub theme: common::theme::Theme<'a>,
 }
 
-pub fn init<'a>(ghost: &mut Ghost) -> Option<GhostGFX<'a>> {
+pub fn init<'a>() -> Option<GhostGFX> {
     if let Ok(graphics_handle) = boot::get_handle_for_protocol::<GraphicsOutput>()
         && let Ok(gop) = boot::open_protocol_exclusive::<GraphicsOutput>(graphics_handle)
     {
@@ -28,7 +28,7 @@ pub fn init<'a>(ghost: &mut Ghost) -> Option<GhostGFX<'a>> {
             resolution: res,
             frame_buffer: Buffer::new(res.0, res.1),
             graphics_proto: gop,
-            theme: common::theme::load(ghost.fs.as_mut().unwrap(), "default"),
+            // theme: common::theme::load(ghost.fs.as_mut().unwrap(), "default"),
         });
     }
     None

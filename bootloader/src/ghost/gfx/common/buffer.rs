@@ -8,7 +8,7 @@ use uefi::proto::console::gop::{BltOp, BltPixel, BltRegion, GraphicsOutput};
 pub struct Buffer {
     width: usize,
     height: usize,
-    pixels: Vec<BltPixel>,
+    pub pixels: Vec<BltPixel>,
 }
 
 impl Buffer {

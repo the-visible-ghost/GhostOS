@@ -38,7 +38,7 @@ pub fn boot(g_host: &mut ghost::Ghost) {
         let pitch = gfx.graphics_proto.current_mode_info().stride();
         let boot_info = common::BootInfo {
             framebuffer: common::gfx::buffer::Buffer::new(
-                gfx.resolution,
+                common::gfx::buffer::Resolution::new(gfx.resolution.0, gfx.resolution.1),
                 pitch,
                 core::slice::from_raw_parts_mut(
                     gfx.graphics_proto.frame_buffer().as_mut_ptr() as *mut u32,
@@ -46,6 +46,7 @@ pub fn boot(g_host: &mut ghost::Ghost) {
                 ),
             ),
         };
+        info!("{:?}", boot_info);
         boot::exit_boot_services(None);
         let kernel: extern "sysv64" fn(&common::BootInfo) -> ! = core::mem::transmute(entry);
         kernel(&boot_info);
