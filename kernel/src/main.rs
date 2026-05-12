@@ -6,11 +6,14 @@ mod allocator;
 extern crate alloc; //created support but cannot use until allocator and its' error handler exists
 
 use crate::allocator::bump::{ALLOCATOR, HEAP_SIZE, HEAP_START};
+extern crate common;
+
+use common::gfx;
 use core::panic::PanicInfo;
 
 #[repr(C)]
 pub struct BootInfo {
-    pub framebuffer_ptr: *mut u32,
+    pub framebuffer_ptr: *mut [u32],
     pub framebuffer_width: u64,
     pub framebuffer_height: u64,
     pub framebuffer_pitch: u64, // pixels per row
@@ -42,6 +45,16 @@ pub extern "C" fn kernel_main(_bi: &'static BootInfo, width: u64) -> ! {
             }
         }
     }
+pub extern "sysv64" fn kernel_main(bi: &'static BootInfo) -> ! {
+    let fb = gfx::buffer::Buffer::new(
+        (
+            bi.framebuffer_width as usize,
+            bi.framebuffer_height as usize,
+        ),
+        bi.framebuffer_pitch as usize,
+        unsafe { &mut *bi.framebuffer_ptr },
+    );
+    fb.text();
     loop {}
 }
 

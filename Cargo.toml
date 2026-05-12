@@ -1,3 +1,9 @@
 [workspace]
-members = ["bootloader","kernel"]
-spin = "0.9"
+members = ["bootloader", "common","kernel"]
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
