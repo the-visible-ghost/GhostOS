@@ -6,19 +6,19 @@ use alloc::vec::Vec;
 use uefi::cstr16;
 use uefi::fs::FileSystem;
 
-pub struct Config<'a> {
+pub struct Config<'config> {
     pub timeout: i32,
     pub default: u8,
-    pub entries: Vec<Entry<'a>>,
+    pub entries: Vec<Entry<'config>>,
 }
 
-pub struct Entry<'a> {
-    pub title: &'a str,
-    pub callback: Option<&'a str>,
-    pub submenu: Option<Vec<Entry<'a>>>,
+pub struct Entry<'entry> {
+    pub title: &'entry str,
+    pub callback: Option<&'entry str>,
+    pub submenu: Option<Vec<Entry<'entry>>>,
 }
 
-fn default<'a>() -> Config<'a> {
+fn default<'config>() -> Config<'config> {
     Config {
         timeout: -1,
         default: 0,
@@ -48,13 +48,13 @@ fn default<'a>() -> Config<'a> {
     }
 }
 
-pub fn load<'a>(fs: &mut FileSystem) -> Config<'a> {
+pub fn load<'config>(fs: &mut FileSystem) -> Config<'config> {
     match parse(fs.read_to_string(cstr16!("\\ghost\\boot.ghost")).ok()) {
         Some(data) => data,
         None => default(),
     }
 }
 
-pub fn parse<'a>(_data: Option<String>) -> Option<Config<'a>> {
+pub fn parse<'config>(_data: Option<String>) -> Option<Config<'config>> {
     None
 }

@@ -28,6 +28,7 @@ fn keypress_handler(g_host: &mut ghost::Ghost) -> u32 {
                     return 1;
                 } else if key == t_key {
                     info!("TERMINAL key pressed");
+                    ghost::boot::chainload::boot(g_host, cstr16!("\\test\\ghost.efi"))
                 } else if key == e_key {
                     info!("EDIT key pressed");
                 } else if key == s_key {
@@ -77,6 +78,7 @@ fn main() -> Status {
         .unwrap();
 
     render_tree::html::parse(html);
+    info!("Render tree parsing complete");
 
     loop {
         if let Some(gfx) = &mut g_host.gfx {

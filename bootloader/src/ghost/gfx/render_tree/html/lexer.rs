@@ -2,33 +2,32 @@ extern crate alloc;
 use alloc::fmt;
 
 #[allow(dead_code)]
-pub enum Token<'a> {
+pub enum Token<'token> {
     AngleOpen,
     AngleClose,
-    Ident(&'a [u8]),
-    String(&'a [u8]),
-    Text(&'a [u8]),
-    // Number(&'a str),
+    Ident(&'token [u8]),
+    String(&'token [u8]),
+    Text(&'token [u8]),
     OpAssign,
     Slash,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(Debug)]
 enum LexerMode {
     Text,
     Tag,
 }
 
 #[derive(Debug)]
-pub struct Lexer<'a> {
+pub struct Lexer<'lexer> {
     index: usize,
     current: u8,
-    html: &'a [u8],
+    html: &'lexer [u8],
     mode: LexerMode,
 }
 
-impl<'a> Lexer<'a> {
-    pub fn new(html: &'a [u8]) -> Self {
+impl<'lexer> Lexer<'lexer> {
+    pub fn new(html: &'lexer [u8]) -> Self {
         let mut lexer = Self {
             index: 0,
             current: 0,
@@ -61,7 +60,15 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn next_token(&mut self) -> Option<Token<'a>> {
+    pub fn peek_token(&mut self) -> Option<Token<'lexer>> {
+        let current_pos = self.index;
+        let token = self.next_token();
+        self.index = current_pos;
+        self.current = self.html[self.index];
+        token
+    }
+
+    pub fn next_token(&mut self) -> Option<Token<'lexer>> {
         if self.current != 0 {
             self.skip_whitespace();
 
@@ -108,7 +115,7 @@ impl<'a> Lexer<'a> {
         None
     }
 
-    fn lex_ident(&mut self) -> Option<Token<'a>> {
+    fn lex_ident(&mut self) -> Option<Token<'lexer>> {
         let start_pos = self.index;
 
         while (b'0' <= self.current && self.current <= b'9')
@@ -120,27 +127,37 @@ impl<'a> Lexer<'a> {
             self.advance();
         }
 
+        if self.current == 0 {
+            return None;
+        }
         Some(Token::Ident(&self.html[start_pos..self.index]))
     }
 
-    fn lex_string(&mut self) -> Option<Token<'a>> {
+    fn lex_string(&mut self) -> Option<Token<'lexer>> {
         let started_with = self.current;
         self.advance(); // consume quote
         let start_pos = self.index;
-        while self.current != started_with {
+        while self.current != started_with && self.current != 0 {
             self.advance();
         }
-        let token = Token::String(&self.html[start_pos..self.index]);
-        self.advance(); // consume quote
-        Some(token)
+        if self.current != 0 {
+            let token = Token::String(&self.html[start_pos..self.index]);
+            self.advance(); // consume quote
+            Some(token)
+        } else {
+            None
+        }
     }
 
-    fn lex_text(&mut self) -> Option<Token<'a>> {
+    fn lex_text(&mut self) -> Option<Token<'lexer>> {
         let start_pos = self.index;
-        while self.current != b'<' {
+        while self.current != b'<' && self.current != 0 {
             self.advance();
         }
-        Some(Token::Text(&self.html[start_pos..self.index]))
+        match self.current {
+            0 => None,
+            _ => Some(Token::Text(&self.html[start_pos..self.index])),
+        }
     }
 }
 

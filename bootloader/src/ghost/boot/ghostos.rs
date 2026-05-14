@@ -1,7 +1,6 @@
 use crate::ghost;
 use elf::ElfBytes;
 use elf::endian::AnyEndian;
-use log::info;
 use uefi::boot;
 use uefi::cstr16;
 use uefi::mem::memory_map::{MemoryMap, MemoryMapMut, MemoryType};
@@ -29,7 +28,6 @@ pub fn boot(g_host: &mut ghost::Ghost) {
         }
     }
 
-    info!("Calling kernel ...");
     let gfx = g_host.gfx.as_mut().unwrap();
     let pitch = gfx.graphics_proto.current_mode_info().stride();
     let mut uefi_mmap = boot::memory_map(MemoryType::LOADER_DATA).unwrap();
@@ -55,7 +53,7 @@ pub fn boot(g_host: &mut ghost::Ghost) {
             ),
             memory_map: common::mmap::MemoryMap::new(mmap_entries.as_ptr(), uefi_mmap.len()),
         };
-        info!("{:?}", boot_info);
+        log::info!("Calling GhostOS Kernel ...");
 
         // USE ITS VALUE (for now no)
         let _ = boot::exit_boot_services(None);

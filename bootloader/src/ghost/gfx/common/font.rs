@@ -2,7 +2,7 @@ extern crate alloc;
 use alloc::string::String;
 
 use super::theme;
-use uefi::{CStr16, CString16, Char16, cstr16, fs::FileSystem};
+use uefi::{CStr16, cstr16, fs::FileSystem};
 
 use ab_glyph::FontVec;
 use hashbrown::HashMap;
