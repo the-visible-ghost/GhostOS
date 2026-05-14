@@ -12,13 +12,17 @@ use core::panic::PanicInfo;
 #[unsafe(no_mangle)]
 pub extern "sysv64" fn kernel_main(boot_info: &'static mut common::BootInfo) -> ! {
     let fb = &mut boot_info.framebuffer;
-    fb.test();
 
     // use alloc::vec::Vec;
     // let mut v = Vec::new();
     // v.push(11);
 
-    loop {}
+    loop {
+        fb.test1();
+        for i in 0..200_000_000 {}
+        fb.test2();
+        for i in 0..200_000_000 {}
+    }
 }
 
 #[panic_handler]

@@ -1,12 +1,15 @@
-use ab_glyph::FontRef;
+extern crate alloc;
+use alloc::string::String;
+
+use ab_glyph::FontVec;
 use hashbrown::HashMap;
 
-pub struct Family<'a> {
-    pub name: &'a str,
-    pub variants: HashMap<&'a str, Variant<'a>>,
+pub struct Family {
+    pub name: String,
+    pub variants: HashMap<String, Variant>,
 }
 
-pub struct Variant<'a> {
-    pub name: &'a str,
-    pub font: FontRef<'a>,
+pub struct Variant {
+    pub name: String,
+    pub font: FontVec,
 }

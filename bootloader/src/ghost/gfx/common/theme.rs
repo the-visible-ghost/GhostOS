@@ -1,26 +1,25 @@
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
+
+use super::font;
+use super::imgs;
 use hashbrown::HashMap;
-use uefi::{CStr16, cstr16, fs::FileSystem};
+use uefi::{CString16, fs::FileSystem};
 
-use super::font::Family;
-
-pub struct Theme<'a> {
-    pub name: &'a str,
-    pub fonts: HashMap<&'a str, Family<'a>>,
-    pub images: HashMap<&'a str, &'a [u8]>,
+pub struct Theme {
+    pub path: CString16,
+    pub fonts: HashMap<String, font::Family>,
+    pub _images: HashMap<String, Vec<u8>>,
 }
 
-pub fn load<'a>(fs: &'a mut FileSystem, name: &'a str) -> Theme<'a> {
+pub fn load(fs: &mut FileSystem, path: CString16) -> Theme {
     let mut theme = Theme {
-        name,
+        path,
         fonts: HashMap::new(),
-        images: HashMap::new(),
+        _images: HashMap::new(),
     };
-    load_fonts(&mut theme, fs);
+    font::load_fonts(&mut theme, fs);
+    imgs::load_images(&mut theme, fs);
     theme
 }
-
-fn load_fonts(theme: &mut Theme, fs: &mut FileSystem) {
-    fs.read_dir(cstr16!("\\ghost\\themes\\default\\assets\\fonts"));
-}
-
-fn load_font(_path: &CStr16) {}

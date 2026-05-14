@@ -64,13 +64,26 @@ impl<'a> Buffer<'a> {
         }
     }
 
-    pub fn test(&mut self) {
+    pub fn test1(&mut self) {
         for x in 0..self.width {
             for y in 0..self.height {
                 self.set_pixel(
                     Position::new(x, y),
                     Color::new((x % 255) as u8, (y % 255) as u8, 255, 255),
                 );
+            }
+        }
+    }
+
+    pub fn test2(&mut self) {
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let rx = (x % 255) as u8;
+                let gy = (y % 255) as u8;
+
+                let b = 255u8.saturating_sub(rx).saturating_sub(gy);
+
+                self.set_pixel(Position::new(x, y), Color::new(rx, gy, b, 255));
             }
         }
     }

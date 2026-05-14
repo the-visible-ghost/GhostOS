@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 extern crate alloc;
 
 use alloc::vec;
@@ -8,7 +10,7 @@ use uefi::proto::console::gop::{BltOp, BltPixel, BltRegion, GraphicsOutput};
 pub struct Buffer {
     width: usize,
     height: usize,
-    pub pixels: Vec<BltPixel>,
+    pixels: Vec<BltPixel>,
 }
 
 impl Buffer {
@@ -20,7 +22,7 @@ impl Buffer {
         }
     }
 
-    pub fn pixel(&mut self, x: usize, y: usize) -> Option<&mut BltPixel> {
+    pub fn get_pixel(&mut self, x: usize, y: usize) -> Option<&mut BltPixel> {
         match x >= self.width || y >= self.height {
             true => None,
             false => self.pixels.get_mut(y * self.width + x),

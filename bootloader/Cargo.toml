@@ -10,7 +10,6 @@ cssparser = "0.37.0"
 elf = { version = "0.8.0", default-features = false }
 hashbrown = "0.17.1"
 log = "0.4.29"
-tl = "0.7.8"
 common = { path = "../common" }
 
 [[bin]]

@@ -10,7 +10,7 @@ pub mod gfx;
 pub struct Ghost<'a> {
     pub ih: uefi::Handle,
     pub gfx: Option<gfx::GhostGFX>,
-    pub fs: Option<FileSystem>,
+    pub fs: FileSystem,
     pub cfg: config::Config<'a>,
     pub stdin: ScopedProtocol<text::Input>,
 }
@@ -20,16 +20,18 @@ impl<'a> Ghost<'a> {
         let image_handle = uefi::boot::image_handle();
         let stdin_handle = uefi::boot::get_handle_for_protocol::<text::Input>().unwrap();
         let stdin = uefi::boot::open_protocol_exclusive::<text::Input>(stdin_handle).unwrap();
-        let mut ghost = Self {
+
+        let mut file_sys = fs::init(image_handle).expect("Failed to initalize filesystem");
+
+        let gfx = gfx::init(&mut file_sys);
+        let cfg = config::load(&mut file_sys);
+
+        Self {
+            fs: file_sys,
             ih: image_handle,
-            gfx: gfx::init(),
-            fs: fs::init(image_handle),
-            cfg: config::new(),
+            gfx,
+            cfg,
             stdin,
-        };
-        if let Some(loaded) = config::load(&mut ghost) {
-            ghost.cfg = loaded;
         }
-        ghost
     }
 }

@@ -1,10 +1,12 @@
 extern crate alloc;
 
+use alloc::string::String;
 use alloc::vec::Vec;
 
-// mod adapter;
-// mod parser;
+mod lexer;
+mod parser;
 
+#[allow(clippy::upper_case_acronyms)]
 pub enum HtmlTag {
     BODY,
     DIV,
@@ -28,4 +30,12 @@ pub enum Attribute<'a> {
     Autoplay,
     Width(usize),
     Height(usize),
+}
+
+pub fn parse<'a>(html: String) -> Element<'a> {
+    Element {
+        tag: HtmlTag::BODY,
+        attributes: Vec::new(),
+        children: Vec::new(),
+    }
 }
