@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 uefi = { version = "0.37.0", features = ["alloc", "global_allocator", "logger", "panic_handler"] }
 ab_glyph = { version = "0.2.32", default-features = false, features = ["libm"] }
-cssparser = "0.37.0"
 elf = { version = "0.8.0", default-features = false }
 hashbrown = "0.17.1"
 log = "0.4.29"

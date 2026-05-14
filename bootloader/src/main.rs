@@ -77,8 +77,8 @@ fn main() -> Status {
         .read_to_string(cstr16!("\\ghost\\themes\\default\\index.html"))
         .unwrap();
 
-    render_tree::html::parse(html);
-    info!("Render tree parsing complete");
+    // render_tree::html::parse(html);
+    // info!("Render tree parsing complete");
 
     loop {
         if let Some(gfx) = &mut g_host.gfx {
