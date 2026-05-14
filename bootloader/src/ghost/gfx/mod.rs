@@ -9,7 +9,7 @@ use uefi::{
 use self::common::buffer::Buffer;
 
 mod common;
-mod render_tree;
+pub mod render_tree;
 mod state;
 
 pub struct GhostGFX {

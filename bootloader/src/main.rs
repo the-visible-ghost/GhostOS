@@ -9,6 +9,8 @@ use log::info;
 use uefi::proto::console::text::{Key, ScanCode};
 use uefi::{Char16, prelude::*};
 
+use crate::ghost::gfx::render_tree;
+
 fn keypress_handler(g_host: &mut ghost::Ghost) -> u32 {
     let enter_key = Char16::try_from('\r').unwrap();
     let t_key = Char16::try_from('t').unwrap();
@@ -73,6 +75,8 @@ fn main() -> Status {
         .fs
         .read_to_string(cstr16!("\\ghost\\themes\\default\\index.html"))
         .unwrap();
+
+    render_tree::html::parse(html);
 
     loop {
         if let Some(gfx) = &mut g_host.gfx {

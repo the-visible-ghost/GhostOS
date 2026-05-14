@@ -2,6 +2,7 @@ extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;
+use log::info;
 
 mod lexer;
 mod parser;
@@ -33,6 +34,11 @@ pub enum Attribute<'a> {
 }
 
 pub fn parse<'a>(html: String) -> Element<'a> {
+    let data = html.as_str();
+    let mut lxr = lexer::Lexer::new(data.as_bytes());
+    while let Some(tok) = lxr.next_token() {
+        info!("{:?}", tok);
+    }
     Element {
         tag: HtmlTag::BODY,
         attributes: Vec::new(),
