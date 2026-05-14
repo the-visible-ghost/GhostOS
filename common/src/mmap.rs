@@ -1,8 +1,8 @@
 #[repr(C)]
 #[derive(Debug)]
 pub struct MemoryMap {
-    entries: *const MemoryEntry,
-    num_entries: usize,
+    pub entries: *const MemoryEntry,
+    pub num_entries: usize,
 }
 
 impl MemoryMap {

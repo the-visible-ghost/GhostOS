@@ -4,12 +4,13 @@ pub struct BumpAllocator {
     next: usize,
 }
 
-pub const HEAP_START: usize = 0x4444_4444_0000; //hardcoded heap area for testing
 pub const HEAP_SIZE: usize = 1024 * 1024; // same as above
 
 use core::alloc::{GlobalAlloc, Layout};
 
+use common::mmap::{MemoryMap, MemoryType};
 use spin::Mutex;
+
 pub struct Locked<A> {
     inner: Mutex<A>,
 }
@@ -27,7 +28,7 @@ impl<A> Locked<A> {
 }
 
 impl BumpAllocator {
-    pub const fn init(&mut self, heap_start: usize, heap_size: usize) {
+    pub fn init(&mut self, heap_start: usize, heap_size: usize) {
         self.heap_start = heap_start;
         self.heap_end = heap_start + heap_size;
         self.next = heap_start;
@@ -40,6 +41,23 @@ impl BumpAllocator {
             next: 0,
         }
     }
+}
+
+pub fn find_heap_region(mmap: &MemoryMap) -> Option<usize> {
+    let entries = unsafe { core::slice::from_raw_parts(mmap.entries, mmap.num_entries) };
+
+    for entry in entries {
+        let typ = MemoryType::from_u32(entry.memorytype);
+
+        if let Some(MemoryType::CONVENTIONAL) = typ {
+            let region_size = entry.page_count as usize * 4096;
+
+            if region_size <= HEAP_SIZE {
+                return Some(entry.phys_start as usize);
+            }
+        }
+    }
+    None
 }
 
 unsafe impl GlobalAlloc for Locked<BumpAllocator> {
