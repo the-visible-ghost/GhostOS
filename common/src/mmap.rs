@@ -1,8 +1,8 @@
 #[repr(C)]
 #[derive(Debug)]
 pub struct MemoryMap {
-    pub entries: *const MemoryEntry,
-    pub num_entries: usize,
+    entries: *const MemoryEntry,
+    num_entries: usize,
 }
 
 impl MemoryMap {
@@ -11,6 +11,11 @@ impl MemoryMap {
             entries,
             num_entries,
         }
+    }
+
+    #[allow(clippy::missing_safety_doc)]
+    pub unsafe fn entries(&self) -> &[MemoryEntry] {
+        unsafe { core::slice::from_raw_parts(self.entries, self.num_entries) }
     }
 }
 
