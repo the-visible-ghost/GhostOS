@@ -6,6 +6,7 @@ pub struct Color {
 }
 
 impl Color {
+    #[inline]
     pub fn new(red: u8, green: u8, blue: u8, alpha: u8) -> Self {
         Self {
             red,

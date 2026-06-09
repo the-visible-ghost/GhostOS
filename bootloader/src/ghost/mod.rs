@@ -1,4 +1,3 @@
-use log::info;
 use uefi::{
     boot::ScopedProtocol,
     fs::FileSystem,
@@ -24,7 +23,7 @@ pub struct Ghost<'ghost> {
 impl<'ghost> Ghost<'ghost> {
     pub fn init() -> Self {
         let image_handle = uefi::boot::image_handle();
-        info!("image_handle: {:?}", image_handle);
+        // log::info!("image_handle: {:?}", image_handle);
         let stdin_handle = uefi::boot::get_handle_for_protocol::<text::Input>().unwrap();
         let stdin = uefi::boot::open_protocol_exclusive::<text::Input>(stdin_handle).unwrap();
 

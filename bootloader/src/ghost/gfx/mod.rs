@@ -1,3 +1,5 @@
+use self::common::buffer::Buffer;
+use self::render::Engine;
 use uefi::{
     CString16,
     boot::{self, ScopedProtocol},
@@ -6,10 +8,8 @@ use uefi::{
     proto::console::gop::GraphicsOutput,
 };
 
-use self::common::buffer::Buffer;
-
 mod common;
-pub mod render_tree;
+pub mod render;
 mod state;
 
 pub struct GhostGFX {
@@ -57,8 +57,9 @@ impl GhostGFX {
         false
     }
 
-    pub fn render(&mut self) {
+    pub fn render(&mut self, engine: &mut Engine) {
         self.ui_state.increment();
+        // engine.render();
         let _ = self.frame_buffer.blit(&mut self.graphics_proto);
     }
 }

@@ -1,9 +1,7 @@
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
-
 use super::font;
 use super::imgs;
+use alloc::string::String;
+use alloc::vec::Vec;
 use hashbrown::HashMap;
 use uefi::{CString16, fs::FileSystem};
 

@@ -17,7 +17,11 @@ bootloader:
     @cp ./target/{{ARCH}}-unknown-uefi/{{MODE}}/bootloader.efi \
         {{SYSROOT}}/boot/efi/boot/bootx64.efi
 
-kernel:
+_entry:
+    mkdir -p ./kernel/build
+    nasm -f elf64 -o ./kernel/build/entry.o ./kernel/src/entry.asm
+
+kernel: _entry
     cargo build -p kernel \
         --target {{ARCH}}-unknown-none \
         --config ./kernel/.cargo/config.toml
@@ -31,7 +35,7 @@ bootloader-release:
     @cp ./target/{{ARCH}}-unknown-uefi/release/bootloader.efi \
         {{SYSROOT}}/boot/efi/boot/bootx64.efi
 
-kernel-release:
+kernel-release: _entry
     cargo build --release -p kernel \
         --target {{ARCH}}-unknown-none \
         --config ./kernel/.cargo/config.toml
@@ -42,10 +46,11 @@ build: bootloader kernel
 build-release: bootloader-release kernel-release
 
 run:
-    qemu-system-{{ARCH}} -enable-kvm -m {{SYSTEM_RAM}} \
+    qemu-system-{{ARCH}} -s -enable-kvm -m {{SYSTEM_RAM}} \
         -drive if=pflash,format=raw,readonly=on,file=./temp/OVMF.4m.fd \
         -drive format=raw,file=fat:rw:{{IMG_PATH}} \
         -serial stdio -display sdl,full-screen=on
 
 clean:
+    rm -rf ./kernel/build
     cargo clean

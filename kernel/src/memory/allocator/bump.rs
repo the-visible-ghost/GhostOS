@@ -49,7 +49,7 @@ pub fn find_heap_region(mmap: &MemoryMap) -> Option<usize> {
     for entry in entries {
         let typ = MemoryType::from_u32(entry.memorytype);
 
-        if let Some(MemoryType::CONVENTIONAL) = typ {
+        if let MemoryType::CONVENTIONAL = typ {
             let region_size = entry.page_count as usize * 4096;
 
             if region_size <= HEAP_SIZE {

@@ -32,12 +32,14 @@ impl<'a> Buffer<'a> {
         }
     }
 
+    #[inline]
     pub fn set_pixel(&mut self, pos: Position, color: Color) {
         if self.check_position(pos.x, pos.y) {
             self.set_pixel_unchecked(pos, color);
         }
     }
 
+    #[inline]
     pub fn get_pixel(&self, x: usize, y: usize) -> Option<Color> {
         if !self.check_position(x, y) {
             return None;
@@ -45,12 +47,14 @@ impl<'a> Buffer<'a> {
         Some(self.get_pixel_unchecked(x, y))
     }
 
+    #[inline]
     pub fn blend_pixel(&mut self, pos: Position, color: Color) {
         if self.check_position(pos.x, pos.y) {
             self.blend_pixel_unchecked(pos, color);
         }
     }
 
+    #[inline]
     pub fn resize(&mut self, x: usize, y: usize) {
         self.width = x;
         self.height = y;
@@ -60,6 +64,30 @@ impl<'a> Buffer<'a> {
         for x in 0..self.width {
             for y in 0..self.height {
                 self.set_pixel(Position::new(x, y), Color::new(0, 0, 0, 0));
+            }
+        }
+    }
+
+    pub fn success(&mut self) {
+        for x in 0..self.width {
+            for y in 0..self.height {
+                self.set_pixel(Position::new(x, y), Color::new(0, 255, 0, 255));
+            }
+        }
+    }
+
+    pub fn error(&mut self) {
+        for x in 0..self.width {
+            for y in 0..self.height {
+                self.set_pixel(Position::new(x, y), Color::new(255, 0, 0, 255));
+            }
+        }
+    }
+
+    pub fn warning(&mut self) {
+        for x in 0..self.width {
+            for y in 0..self.height {
+                self.set_pixel(Position::new(x, y), Color::new(255, 255, 0, 255));
             }
         }
     }

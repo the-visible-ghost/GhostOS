@@ -1,15 +1,17 @@
+#![allow(dead_code)]
 #![no_std]
 #![no_main]
 
-mod ghost;
+extern crate alloc;
 
+use alloc::string::String;
 use core::time::Duration;
-
-use log::info;
 use uefi::proto::console::text::{Key, ScanCode};
 use uefi::{Char16, prelude::*};
 
-use crate::ghost::gfx::render_tree;
+use crate::ghost::gfx::render;
+
+mod ghost;
 
 fn keypress_handler(g_host: &mut ghost::Ghost) -> u32 {
     let enter_key = Char16::try_from('\r').unwrap();
@@ -23,33 +25,33 @@ fn keypress_handler(g_host: &mut ghost::Ghost) -> u32 {
         match key {
             Key::Printable(key) => {
                 if key == enter_key {
-                    info!("BOOT key pressed");
+                    log::info!("BOOT key pressed");
                     ghost::boot::ghostos::boot(g_host);
                     return 1;
                 } else if key == t_key {
-                    info!("TERMINAL key pressed");
+                    log::info!("TERMINAL key pressed");
                     ghost::boot::chainload::boot(g_host, cstr16!("\\test\\ghost.efi"))
                 } else if key == e_key {
-                    info!("EDIT key pressed");
+                    log::info!("EDIT key pressed");
                 } else if key == s_key {
-                    info!("SCREENSHOT key pressed");
+                    log::info!("SCREENSHOT key pressed");
                 }
             }
             Key::Special(code) => match code {
                 ScanCode::UP | ScanCode::LEFT => {
-                    info!("UP or LEFT key pressed");
+                    log::info!("UP or LEFT key pressed");
                 }
                 ScanCode::DOWN | ScanCode::RIGHT => {
-                    info!("DOWN or RIGHT key pressed");
+                    log::info!("DOWN or RIGHT key pressed");
                 }
                 ScanCode::HOME => {
-                    info!("HOME key pressed");
+                    log::info!("HOME key pressed");
                 }
                 ScanCode::END => {
-                    info!("END key pressed");
+                    log::info!("END key pressed");
                 }
                 ScanCode::ESCAPE => {
-                    info!("ESCAPE key pressed");
+                    log::info!("ESCAPE key pressed");
                     return 1;
                 }
                 _ => {}
@@ -64,12 +66,10 @@ fn main() -> Status {
     uefi::helpers::init().unwrap();
 
     let mut g_host = ghost::Ghost::init();
-    info!("Ghost initialized successfully ...");
+    log::info!("Ghost initialized successfully ...");
 
     if let Some(gfx) = &mut g_host.gfx {
         gfx.set_res(1920, 1080);
-        // gfx.frame_buffer.pixels[0] = BltPixel::new(255, 0, 0);
-        // gfx.frame_buffer.blit(&mut gfx.graphics_proto);
     }
 
     let html = g_host
@@ -77,12 +77,14 @@ fn main() -> Status {
         .read_to_string(cstr16!("\\ghost\\themes\\default\\index.html"))
         .unwrap();
 
-    // render_tree::html::parse(html);
-    // info!("Render tree parsing complete");
+    let mut engine = render::Engine::new(render::RawData {
+        html,
+        css: String::new(),
+    });
 
     loop {
         if let Some(gfx) = &mut g_host.gfx {
-            gfx.render();
+            gfx.render(&mut engine);
         }
         let s = keypress_handler(&mut g_host);
         if s == 1 {

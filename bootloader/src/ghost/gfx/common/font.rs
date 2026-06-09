@@ -1,11 +1,8 @@
-extern crate alloc;
-use alloc::string::String;
-
 use super::theme;
-use uefi::{CStr16, cstr16, fs::FileSystem};
-
 use ab_glyph::FontVec;
+use alloc::string::String;
 use hashbrown::HashMap;
+use uefi::{CStr16, cstr16, fs::FileSystem};
 
 pub struct Family {
     pub name: String,
@@ -48,6 +45,7 @@ fn load_font(fs: &mut FileSystem, path: &CStr16) -> Family {
         .read_dir(path)
         .unwrap_or_else(|_| panic!("Failed to read font: {}", path));
 
+    // TODO: font family
     let family = Family {
         name: todo!(),
         variants: todo!(),

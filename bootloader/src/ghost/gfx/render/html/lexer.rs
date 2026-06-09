@@ -1,24 +1,18 @@
-extern crate alloc;
+use super::token::Token;
 use alloc::fmt;
 
-#[allow(dead_code)]
-pub enum Token<'token> {
-    AngleOpen,
-    AngleClose,
-    Ident(&'token [u8]),
-    String(&'token [u8]),
-    Text(&'token [u8]),
-    OpAssign,
-    Slash,
-}
-
-#[derive(Debug)]
+#[derive(Clone, Copy)]
 enum LexerMode {
     Text,
     Tag,
 }
 
-#[derive(Debug)]
+struct LexerSnapshot {
+    pub index: usize,
+    pub current: u8,
+    pub mode: LexerMode,
+}
+
 pub struct Lexer<'lexer> {
     index: usize,
     current: u8,
@@ -34,6 +28,7 @@ impl<'lexer> Lexer<'lexer> {
             html,
             mode: LexerMode::Text,
         };
+
         if !html.is_empty() {
             lexer.current = html[0];
             lexer.mode = match lexer.current {
@@ -44,6 +39,7 @@ impl<'lexer> Lexer<'lexer> {
         lexer
     }
 
+    #[inline]
     fn advance(&mut self) {
         self.index += 1;
         match self.index >= self.html.len() {
@@ -52,6 +48,7 @@ impl<'lexer> Lexer<'lexer> {
         }
     }
 
+    #[inline]
     fn skip_whitespace(&mut self) {
         while self.current != 0
             && (self.current == b' ' || self.current == b'\t' || self.current == b'\n')
@@ -60,11 +57,26 @@ impl<'lexer> Lexer<'lexer> {
         }
     }
 
+    #[inline]
+    fn snapshot(&self) -> LexerSnapshot {
+        LexerSnapshot {
+            current: self.current,
+            index: self.index,
+            mode: self.mode,
+        }
+    }
+
+    #[inline]
+    fn load_snapshot(&mut self, snapshot: LexerSnapshot) {
+        self.current = snapshot.current;
+        self.index = snapshot.index;
+        self.mode = snapshot.mode;
+    }
+
     pub fn peek_token(&mut self) -> Option<Token<'lexer>> {
-        let current_pos = self.index;
+        let snapshot = self.snapshot();
         let token = self.next_token();
-        self.index = current_pos;
-        self.current = self.html[self.index];
+        self.load_snapshot(snapshot);
         token
     }
 
@@ -115,6 +127,7 @@ impl<'lexer> Lexer<'lexer> {
         None
     }
 
+    #[inline]
     fn lex_ident(&mut self) -> Option<Token<'lexer>> {
         let start_pos = self.index;
 
@@ -133,6 +146,7 @@ impl<'lexer> Lexer<'lexer> {
         Some(Token::Ident(&self.html[start_pos..self.index]))
     }
 
+    #[inline]
     fn lex_string(&mut self) -> Option<Token<'lexer>> {
         let started_with = self.current;
         self.advance(); // consume quote
@@ -149,6 +163,7 @@ impl<'lexer> Lexer<'lexer> {
         }
     }
 
+    #[inline]
     fn lex_text(&mut self) -> Option<Token<'lexer>> {
         let start_pos = self.index;
         while self.current != b'<' && self.current != 0 {

@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-spin = "0.10.0"
+elf = { version = "0.8.0", default-features = false }
 
 common = { path = "../common" }
