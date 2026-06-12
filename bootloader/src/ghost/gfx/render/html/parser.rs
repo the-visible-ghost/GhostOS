@@ -12,6 +12,7 @@ pub struct Parser<'parser> {
     lexer: Lexer<'parser>,
     last_token: Option<Token<'parser>>,
     current: Option<Token<'parser>>,
+    node_id: u16,
 }
 
 pub enum Tag {
@@ -25,6 +26,7 @@ impl<'parser> Parser<'parser> {
             lexer,
             current: None,
             last_token: None,
+            node_id: 1,
         };
         parser.advance();
         parser
@@ -67,6 +69,7 @@ impl<'parser> Parser<'parser> {
 
     #[inline]
     fn parse_tag(&mut self) -> Tag {
+        let mut is_void = false;
         self.expect_and_consume(TokenKind::AngleOpen);
         if matches!(self.current, Some(Token::Slash)) {
             self.advance(); // Consume slash
@@ -78,7 +81,7 @@ impl<'parser> Parser<'parser> {
         let tag = match self.current {
             Some(Token::Ident(b"body")) => HtmlTag::Body,
             Some(Token::Ident(b"div")) => HtmlTag::Div,
-            Some(Token::Ident(b"image")) => HtmlTag::Img,
+            Some(Token::Ident(b"img")) => HtmlTag::Img,
             Some(Token::Ident(b"video")) => HtmlTag::Video,
             Some(Token::Ident(b"input")) => HtmlTag::Input,
             Some(Token::Ident(b"span")) => HtmlTag::Span,
@@ -106,33 +109,44 @@ impl<'parser> Parser<'parser> {
                     str::from_utf8(name).expect("Invalid UTF-8").to_string(),
                     self.parse_attr(),
                 ),
+                Token::Slash => {
+                    self.advance(); // Consume slash
+                    self.expect_and_consume(TokenKind::AngleClose);
+                    is_void = true;
+                    break;
+                }
                 _ => panic!("Unexpected token {:?}", token),
             };
             self.advance();
         }
 
-        let mut children = Vec::<Node>::new();
-        loop {
-            match self.current {
-                Some(Token::Text(string)) => {
-                    children.push(Node::Text(
-                        str::from_utf8(string).expect("Invalid UTF-8").to_string(),
-                    ));
-                    self.advance();
-                }
-                Some(_) => {
-                    let tag = self.parse_tag();
-                    match tag {
-                        Tag::Closing => break,
-                        Tag::Opening(node) => children.push(node),
+        let mut children = Vec::with_capacity(0);
+        if !is_void {
+            loop {
+                match self.current {
+                    Some(Token::Text(string)) => {
+                        children.push(Node::Text(
+                            str::from_utf8(string).expect("Invalid UTF-8").to_string(),
+                        ));
+                        self.advance();
                     }
+                    Some(_) => {
+                        let tag = self.parse_tag();
+                        match tag {
+                            Tag::Closing => break,
+                            Tag::Opening(node) => children.push(node),
+                        }
+                    }
+                    None => break,
                 }
-                None => break,
             }
         }
 
+        self.node_id += 1;
+
         Tag::Opening(Node::Element {
             tag,
+            node_id: self.node_id,
             attributes,
             children,
         })

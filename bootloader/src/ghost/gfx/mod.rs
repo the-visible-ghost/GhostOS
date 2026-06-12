@@ -59,7 +59,7 @@ impl GhostGFX {
 
     pub fn render(&mut self, engine: &mut Engine) {
         self.ui_state.increment();
-        // engine.render();
+        // engine.render(&mut self.ui_state);
         let _ = self.frame_buffer.blit(&mut self.graphics_proto);
     }
 }

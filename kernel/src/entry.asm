@@ -18,11 +18,12 @@ _start:
     mov [rsp + 8], __pt_arena_size
     mov rsi, rsp
     lea rax, [rel bootstrap]
-    ; int3
-    call rax
-    ; lea rsp, __stack_bottom
-    ; mov cr3, rax
+    call rax ; calls bootstrap
     add rsp, 16
+
+    ; lea rsp, __stack_bottom
+    ; mov cr3, rax ; takeover paging
+    jmp $
 
     ; pop rdi
     ; mov rsp, __stack_bottom
@@ -50,7 +51,7 @@ section .bss
 
 ; Page Table Arena
 align 0x1000
-__pt_arena: resb 0x400000
+__pt_arena: resb 0xF00000
 __pt_arena_size equ $ - __pt_arena
 
 ; Kernel Stack

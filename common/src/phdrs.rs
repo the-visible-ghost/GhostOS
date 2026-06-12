@@ -1,4 +1,4 @@
-// Program Hedares representation
+// Program Headers representation
 use core::fmt;
 
 #[repr(C)]

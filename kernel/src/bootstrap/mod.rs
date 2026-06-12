@@ -27,6 +27,15 @@ pub extern "sysv64" fn bootstrap(boot_info: &mut common::BootInfo, pt_arena: *mu
             header.flags,
         );
 
+        pt_map::linear(
+            pml4,
+            arena,
+            header.phys_addr as *mut u8,
+            header.phys_addr as *mut u8,
+            header.mem_size as usize >> 12,
+            header.flags,
+        );
+
         index += 1;
     }
 
@@ -36,7 +45,7 @@ pub extern "sysv64" fn bootstrap(boot_info: &mut common::BootInfo, pt_arena: *mu
         arena,
         boot_info.framebuffer.frame.as_mut_ptr() as *mut u8,
         boot_info.framebuffer.frame.as_mut_ptr() as *mut u8,
-        (boot_info.framebuffer.width * boot_info.framebuffer.height) << 10,
+        (boot_info.framebuffer.width * boot_info.framebuffer.height) >> 10,
         0b110,
     );
 }

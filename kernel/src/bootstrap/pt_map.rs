@@ -50,12 +50,16 @@ pub fn linear(
         pte.set_present();
         pte.set_page(unsafe { phys.add(index << 12) });
 
-        if flags & 0x01 == 0 {
-            pte.set_no_execute();
-        }
-        if flags & 0x02 != 0 {
-            pte.set_read_write();
-        }
+        // if flags & 0x01 == 0 {
+        //     pte.set_no_execute();
+        // }
+        // if flags & 0x02 != 0 {
+        //     pte.set_read_write();
+        // }
+
+        // pte.set_no_execute();
+        pte.clear_no_execute();
+        pte.set_read_write();
 
         index += 1;
     }
